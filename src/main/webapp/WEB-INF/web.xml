@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0">
+
+    <display-name>Language Club</display-name>
+
+    <!-- ========= Contexto (config app) ========= -->
+    <resource-ref>
+        <description>PostgreSQL DataSource</description>
+        <res-ref-name>jdbc/LCDB</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
+
+    <!-- DB -->
+    <context-param>
+        <param-name>DB_URL</param-name>
+        <param-value>jdbc:postgresql://localhost:5448/proyect-oris-1</param-value>
+    </context-param>
+    <context-param>
+        <param-name>DB_USER</param-name>
+        <param-value>xludw1ng</param-value>
+    </context-param>
+    <context-param>
+        <param-name>DB_PASS</param-name>
+        <param-value>123456</param-value>
+    </context-param>
+
+    <!-- I18N -->
+    <context-param>
+        <param-name>supportedLocales</param-name>
+        <param-value>en,ru</param-value>
+    </context-param>
+    <context-param>
+        <param-name>defaultLocale</param-name>
+        <param-value>en</param-value>
+    </context-param>
+
+    <!-- Uploads -->
+    <context-param>
+        <param-name>UPLOAD_DIR</param-name>
+        <param-value>/home/xludw1ng/uploads/languageclub</param-value>
+    </context-param>
+    <context-param>
+        <param-name>MAX_UPLOAD_MB</param-name>
+        <param-value>25</param-value>
+    </context-param>
+
+    <!-- ========= Listener ========= -->
+    <listener>
+        <listener-class>org.lcerda.languageclub.web.listener.AppContextListener</listener-class>
+    </listener>
+
+<!--     ========= Filtros =========-->
+<!--     1) Charset a UTF-8-->
+<!--    <filter>-->
+<!--        <filter-name>CharsetFilter</filter-name>-->
+<!--        <filter-class>org.lcerda.languageclub.web.filter.CharsetFilter</filter-class>-->
+<!--    </filter>-->
+<!--    <filter-mapping>-->
+<!--        <filter-name>CharsetFilter</filter-name>-->
+<!--        <url-pattern>/*</url-pattern>-->
+<!--    </filter-mapping>-->
+
+<!--    &lt;!&ndash; 2) Locale EN/RU (lee ?lang=) &ndash;&gt;-->
+<!--    <filter>-->
+<!--        <filter-name>LocaleFilter</filter-name>-->
+<!--        <filter-class>org.lcerda.languageclub.web.filter.LocaleFilter</filter-class>-->
+<!--    </filter>-->
+<!--    <filter-mapping>-->
+<!--        <filter-name>LocaleFilter</filter-name>-->
+<!--        <url-pattern>/*</url-pattern>-->
+<!--    </filter-mapping>-->
+
+    <!-- 3) Autenticación (protege /app/*) -->
+    <filter>
+        <filter-name>AuthFilter</filter-name>
+        <filter-class>org.lcerda.languageclub.web.filter.AuthFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/app/*</url-pattern>
+    </filter-mapping>
+
+    <!-- 4) Roles (protege /admin/*) -->
+    <filter>
+        <filter-name>RoleFilter</filter-name>
+        <filter-class>org.lcerda.languageclub.web.filter.RoleFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>RoleFilter</filter-name>
+        <url-pattern>/admin/*</url-pattern>
+    </filter-mapping>
+
+    <!-- ========= Servlets ========= -->
+    <servlet>
+        <servlet-name>HomeServlet</servlet-name>
+        <servlet-class>org.lcerda.languageclub.web.servlet.HomeServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>HomeServlet</servlet-name>
+        <url-pattern>/app/home</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>AuthServlet</servlet-name>
+        <servlet-class>org.lcerda.languageclub.web.servlet.AuthServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AuthServlet</servlet-name>
+        <url-pattern>/login</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AuthServlet</servlet-name>
+        <url-pattern>/register</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AuthServlet</servlet-name>
+        <url-pattern>/logout</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>SeriesServlet</servlet-name>
+        <servlet-class>org.lcerda.languageclub.web.servlet.SeriesServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SeriesServlet</servlet-name>
+        <url-pattern>/series</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>LessonsListServlet</servlet-name>
+        <servlet-class>org.lcerda.languageclub.web.servlet.LessonsListServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LessonsListServlet</servlet-name>
+        <url-pattern>/app/lessons</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>LessonFormServlet</servlet-name>
+        <servlet-class>org.lcerda.languageclub.web.servlet.LessonFormServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LessonFormServlet</servlet-name>
+        <url-pattern>/app/lessons/new</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>LessonFormServlet</servlet-name>
+        <url-pattern>/app/lessons/edit</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>LessonEnrollServlet</servlet-name>
+        <servlet-class>org.lcerda.languageclub.web.servlet.LessonEnrollServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LessonEnrollServlet</servlet-name>
+        <url-pattern>/app/lessons/enroll</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
+        <servlet-name>AssignmentsServlet</servlet-name>
+        <servlet-class>org.lcerda.languageclub.web.servlet.AssignmentsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AssignmentsServlet</servlet-name>
+        <url-pattern>/app/assignments</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>AttendanceServlet</servlet-name>
+        <servlet-class>org.lcerda.languageclub.web.servlet.AttendanceServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AttendanceServlet</servlet-name>
+        <url-pattern>/app/attendance</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>SubmissionsServlet</servlet-name>
+        <servlet-class>org.lcerda.languageclub.web.servlet.SubmissionsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SubmissionsServlet</servlet-name>
+        <url-pattern>/app/submissions</url-pattern>
+    </servlet-mapping>
+
+
+
+    <servlet>
+        <servlet-name>AdminUsersServlet</servlet-name>
+        <servlet-class>org.lcerda.languageclub.web.servlet.AdminUsersServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminUsersServlet</servlet-name>
+        <url-pattern>/admin/users</url-pattern>
+    </servlet-mapping>
+
+    <!-- Descarga y subida de archivos (controlados) -->
+    <servlet>
+        <servlet-name>FilesServlet</servlet-name>
+        <servlet-class>org.lcerda.languageclub.web.servlet.FilesServlet</servlet-class>
+        <!-- Config de multipart (si no usas @MultipartConfig en la clase) -->
+        <multipart-config>
+            <max-file-size>26214400</max-file-size>        <!-- 25 MB -->
+            <max-request-size>52428800</max-request-size>  <!-- 50 MB -->
+            <file-size-threshold>0</file-size-threshold>
+        </multipart-config>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FilesServlet</servlet-name>
+        <url-pattern>/app/files/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- ========= Bienvenida / Errores ========= -->
+    <welcome-file-list>
+        <welcome-file>pages/index.jsp</welcome-file>
+    </welcome-file-list>
+
+    <error-page>
+        <error-code>404</error-code>
+        <location>/pages/error/404.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/pages/error/500.jsp</location>
+    </error-page>
+
+    <!-- ========= Sesión ========= -->
+    <session-config>
+        <session-timeout>30</session-timeout>
+        <cookie-config>
+            <name>LCSESSION</name>
+            <http-only>true</http-only>
+            <secure>false</secure> <!-- pon true si usas HTTPS -->
+        </cookie-config>
+        <tracking-mode>COOKIE</tracking-mode>
+    </session-config>
+</web-app>
