@@ -64,16 +64,6 @@
 <!--        <url-pattern>/*</url-pattern>-->
 <!--    </filter-mapping>-->
 
-<!--    &lt;!&ndash; 2) Locale EN/RU (lee ?lang=) &ndash;&gt;-->
-<!--    <filter>-->
-<!--        <filter-name>LocaleFilter</filter-name>-->
-<!--        <filter-class>org.lcerda.languageclub.web.filter.LocaleFilter</filter-class>-->
-<!--    </filter>-->
-<!--    <filter-mapping>-->
-<!--        <filter-name>LocaleFilter</filter-name>-->
-<!--        <url-pattern>/*</url-pattern>-->
-<!--    </filter-mapping>-->
-
     <!-- 3) Autenticación (protege /app/*) -->
     <filter>
         <filter-name>AuthFilter</filter-name>
@@ -114,10 +104,6 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AuthServlet</servlet-name>
-        <url-pattern>/register</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>AuthServlet</servlet-name>
         <url-pattern>/logout</url-pattern>
     </servlet-mapping>
 
@@ -137,6 +123,17 @@
     <servlet-mapping>
         <servlet-name>LessonsListServlet</servlet-name>
         <url-pattern>/app/lessons</url-pattern>
+    </servlet-mapping>
+
+    <!-- JSON API para Lessons (AJAX + JSON) -->
+    <servlet>
+        <servlet-name>LessonsApiServlet</servlet-name>
+        <servlet-class>org.lcerda.languageclub.web.servlet.LessonsApiServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>LessonsApiServlet</servlet-name>
+        <url-pattern>/app/api/lessons</url-pattern>
     </servlet-mapping>
 
     <servlet>

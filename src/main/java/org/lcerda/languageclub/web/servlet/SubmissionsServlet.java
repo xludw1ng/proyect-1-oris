@@ -131,7 +131,10 @@ public class SubmissionsServlet extends HttpServlet {
             AssignmentService assignmentService = buildAssignmentService(conn);
             UserDao userDao = buildUserDao(conn);
 
-            // Cargamos la tarea (permiso se valida dentro del service)
+            // ---- aquí puede saltar ValidationException si:
+            //  - tarea no existe
+            //  - alumno no tiene acceso
+            //  - tarea no está publicada / está cerrada / deadline pasada (según tu service)
             Assignment assignment = assignmentService.getAssignmentForUser(
                     assignmentId, currentUser, roles);
 
@@ -143,7 +146,7 @@ public class SubmissionsServlet extends HttpServlet {
                         submissionService.getSubmissionsForAssignment(
                                 assignmentId, currentUser, roles);
 
-                // mapa userId -> User para mostrar nombre
+                // mapa userId -> User (para mostrar nombre completo)
                 Map<UUID, User> studentsById = new HashMap<>();
                 for (Submissions s : submissions) {
                     UUID uid = s.getUserId();
@@ -152,10 +155,8 @@ public class SubmissionsServlet extends HttpServlet {
                     }
                 }
 
-                // catálogo de estados (PENDING, SUBMITTED, GRADED)
-                List<SubmissionsStatus> statuses =
-                        submissionService.getAllStatuses();
-
+                // catálogo de estados
+                List<SubmissionsStatus> statuses = submissionService.getAllStatuses();
                 Map<Short, String> statusCodeById = new HashMap<>();
                 for (SubmissionsStatus st : statuses) {
                     statusCodeById.put(st.getId(), st.getCode());
@@ -172,7 +173,7 @@ public class SubmissionsServlet extends HttpServlet {
                         .forward(req, resp);
 
             } else {
-                // ===== vista ALUMNO: su propia entrega (+ formulario) =====
+                // ===== vista ALUMNO: su propia entrega =====
                 Submissions mySubmission =
                         submissionService.getSubmissionForStudent(
                                 assignmentId, currentUser);
@@ -183,14 +184,41 @@ public class SubmissionsServlet extends HttpServlet {
                         .forward(req, resp);
             }
 
-        } catch (ValidationException | AuthException e) {
+        } catch (ValidationException e) {
+            // Assignment no disponible (DRAFT, CLOSED, deadline, sin acceso, etc.)
+            req.setAttribute("error", e.getMessage());
+
+            //  NUEVO: intentar cargar la submission del alumno para mostrar nota/estado
+            try (Connection conn2 = DataSourceProvider.getConnection(getServletContext())) {
+                SubmissionService submissionService2 = buildSubmissionService(conn2);
+
+                try {
+                    Submissions mySubmission =
+                            submissionService2.getSubmissionForStudent(
+                                    assignmentId, currentUser);
+                    req.setAttribute("submission", mySubmission);
+                } catch (ValidationException | AuthException ex) {
+                    // si tampoco podemos obtener la entrega, la ignoramos silenciosamente
+                }
+
+            } catch (SQLException ex) {
+                throw new ServletException("Error loading submission for unavailable assignment.", ex);
+            }
+
+            req.getRequestDispatcher("/pages/submissions/unavailable.jsp")
+                    .forward(req, resp);
+
+        }  catch (AuthException e) {
+            // permisos muy raros -> de momento a 500
             req.setAttribute("error", e.getMessage());
             req.getRequestDispatcher("/pages/error/500.jsp")
                     .forward(req, resp);
+
         } catch (SQLException e) {
             throw new ServletException("Error loading submissions.", e);
         }
     }
+
 
     // ===== POST: envío alumno o guardado de nota =====
 

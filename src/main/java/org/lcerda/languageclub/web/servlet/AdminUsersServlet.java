@@ -30,6 +30,22 @@ public class AdminUsersServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+
+        String mode = req.getParameter("mode");
+
+        // Si viene ?mode=create -> mostrar sólo el formulario de creación
+        if ("create".equals(mode)) {
+            req.getRequestDispatcher("/pages/admin/user-form.jsp")
+                    .forward(req, resp);
+            return;
+        }
+
+        // Si viene ?success=userCreated -> mensaje de éxito en la lista
+        String success = req.getParameter("success");
+        if ("userCreated".equals(success)) {
+            req.setAttribute("success", "User created successfully.");
+        }
+
         loadUsersAndForward(req, resp);
     }
 
@@ -76,7 +92,9 @@ public class AdminUsersServlet extends HttpServlet {
 
         if (password == null || !password.equals(confirmPassword)) {
             req.setAttribute("error", "Passwords do not match.");
-            loadUsersAndForward(req, resp);
+            // Volvemos al formulario de creación, no a la lista
+            req.getRequestDispatcher("/pages/admin/user-form.jsp")
+                    .forward(req, resp);
             return;
         }
 
@@ -85,11 +103,14 @@ public class AdminUsersServlet extends HttpServlet {
 
             userService.createUser(email, password, fullName);
 
-            resp.sendRedirect(req.getContextPath() + "/admin/users");
+            // Redirigimos a la lista con mensaje de éxito
+            resp.sendRedirect(req.getContextPath() + "/admin/users?success=userCreated");
 
         } catch (ValidationException | DuplicateEmailException e) {
             req.setAttribute("error", e.getMessage());
-            loadUsersAndForward(req, resp);
+            // Volvemos al formulario con los datos rellenados
+            req.getRequestDispatcher("/pages/admin/user-form.jsp")
+                    .forward(req, resp);
         } catch (SQLException e) {
             throw new ServletException("Error creating user from admin.", e);
         }

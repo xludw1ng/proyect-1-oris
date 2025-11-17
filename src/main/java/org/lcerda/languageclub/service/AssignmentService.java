@@ -13,7 +13,7 @@ public interface AssignmentService {
 
     List<Assignment> getAssignmentsForLesson(UUID lessonId, User currentUser, Set<String> roles);
 
-    UUID createAssignmentForLesson(UUID lessonId, User currentUser, Set<String> roles, String title, String description, OffsetDateTime dueAt);
+    void createAssignmentForLesson(UUID lessonId, User currentUser, Set<String> roles, String title, String description, OffsetDateTime dueAt);
 
     void changeStatus(UUID assignmentId, short newStatusId, User currentUser, Set<String> roles);
 

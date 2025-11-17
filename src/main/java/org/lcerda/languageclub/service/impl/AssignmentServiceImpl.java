@@ -41,7 +41,7 @@ public class AssignmentServiceImpl implements AssignmentService {
     }
 
     @Override
-    public UUID createAssignmentForLesson(UUID lessonId,
+    public void createAssignmentForLesson(UUID lessonId,
                                           User currentUser,
                                           Set<String> roles,
                                           String title,
@@ -72,7 +72,7 @@ public class AssignmentServiceImpl implements AssignmentService {
                 .dueAt(dueAt)
                 .build();
 
-        return assignmentDao.create(asg);
+        assignmentDao.create(asg);
     }
 
     @Override
@@ -145,7 +145,7 @@ public class AssignmentServiceImpl implements AssignmentService {
                 throw new AuthException("You are not enrolled in this lesson.");
             }
             if (asg.getStatusId() != STATUS_PUBLISHED) {
-                throw new AuthException("This assignment is not available.");
+                throw new ValidationException("This assignment is not available.");
             }
             return asg;
         }

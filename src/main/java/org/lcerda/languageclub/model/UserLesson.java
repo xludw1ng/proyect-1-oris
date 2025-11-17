@@ -14,6 +14,6 @@ import java.util.UUID;
 @Builder
 public class UserLesson {
     private UUID userId;
-    private UUID roleId;
+    private UUID lessonId;
     private OffsetDateTime enrolledAt;
 }

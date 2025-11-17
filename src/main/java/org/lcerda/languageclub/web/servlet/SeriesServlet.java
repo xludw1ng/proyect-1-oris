@@ -27,47 +27,11 @@ import java.util.Set;
 import java.util.UUID;
 
 public class SeriesServlet extends HttpServlet {
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
-        HttpSession session = req.getSession(false);
-        if (session == null) {
-            resp.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
-
-        Object u =session.getAttribute("currentUser");
-        Object r = session.getAttribute("currentUserRoles");
-
-        if (!(u instanceof User)) {
-            resp.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
-
-        User currectUser = (User) u;
-
-        Set<String> roles = (r instanceof Set) ? (Set<String>) r : Set.of();
-
-        boolean isAdmin = roles.contains("ADMIN");
-
-        try (Connection conn = DataSourceProvider.getConnection(getServletContext())) {
-            SeriesDao seriesDao = new SeriesDaoJdbcImpl(conn);
-            SeriesService seriesService = new SeriesServiceImpl(seriesDao);
-
-            List<Series> seriesList = seriesService.getSeriesForUser(currectUser, roles);
-            req.setAttribute("seriesList", seriesList);
-            req.setAttribute("userRoles", roles);
-            req.setAttribute("isAdmin", isAdmin);
-
-            req.getRequestDispatcher("/pages/series/list.jsp").forward(req, resp);
-        }catch (SQLException e) {
-            throw new ServletException("Error series lesson list",e);
-        }
-
-    }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
         HttpSession session = req.getSession(false);
         if (session == null) {
             resp.sendRedirect(req.getContextPath() + "/login");
@@ -82,6 +46,61 @@ public class SeriesServlet extends HttpServlet {
             return;
         }
 
+        User currentUser = (User) u;
+        Set<String> roles = (r instanceof Set) ? (Set<String>) r : Set.of();
+        boolean isAdmin = roles.contains("ADMIN");
+
+        String mode = req.getParameter("mode");
+        if (mode == null || mode.isBlank()) {
+            mode = "list";
+        }
+
+        // siempre necesitamos saber si es admin
+        req.setAttribute("isAdmin", isAdmin);
+        req.setAttribute("userRoles", roles);
+
+        try (Connection conn = DataSourceProvider.getConnection(getServletContext())) {
+            SeriesDao seriesDao = new SeriesDaoJdbcImpl(conn);
+            SeriesService seriesService = new SeriesServiceImpl(seriesDao);
+
+            switch (mode) {
+                case "list" -> {
+                    List<Series> seriesList = seriesService.getSeriesForUser(currentUser, roles);
+                    req.setAttribute("seriesList", seriesList);
+                    req.getRequestDispatcher("/pages/series/list.jsp").forward(req, resp);
+                }
+                case "create" -> {
+                    if (!isAdmin) {
+                        resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Only admins can create courses.");
+                        return;
+                    }
+                    // solo mostramos el formulario
+                    req.getRequestDispatcher("/pages/series/create.jsp").forward(req, resp);
+                }
+                default -> resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unknown mode: " + mode);
+            }
+        } catch (SQLException e) {
+            throw new ServletException("Error series lesson list", e);
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        HttpSession session = req.getSession(false);
+        if (session == null) {
+            resp.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+
+        Object u = session.getAttribute("currentUser");
+        Object r = session.getAttribute("currentUserRoles");
+
+        if (!(u instanceof User)) {
+            resp.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
 
         Set<String> roles = (r instanceof Set) ? (Set<String>) r : Set.of();
 
@@ -102,7 +121,6 @@ public class SeriesServlet extends HttpServlet {
         }
     }
 
-
     private void handleCreateSeries(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
@@ -112,6 +130,7 @@ public class SeriesServlet extends HttpServlet {
         String title = req.getParameter("title");
         String description = req.getParameter("description");
 
+        // para repoblar el formulario en caso de error
         req.setAttribute("formCode", code);
         req.setAttribute("formLanguage", language);
         req.setAttribute("formLevel", level);
@@ -125,10 +144,12 @@ public class SeriesServlet extends HttpServlet {
 
             seriesService.createSeries(code, language, level, title, description);
 
-            resp.sendRedirect(req.getContextPath() + "/series");
+            // success → volvemos a la lista con mensaje
+            resp.sendRedirect(req.getContextPath() + "/series?created=1");
         } catch (ValidationException e) {
             req.setAttribute("error", e.getMessage());
-            doGet(req, resp);
+            // volvemos al formulario create
+            req.getRequestDispatcher("/pages/series/create.jsp").forward(req, resp);
         } catch (SQLException e) {
             throw new ServletException("Error creating course(series)", e);
         }
@@ -154,14 +175,12 @@ public class SeriesServlet extends HttpServlet {
                 return;
             }
 
-            resp.sendRedirect(req.getContextPath() + "/series");
+            resp.sendRedirect(req.getContextPath() + "/series?deleted=1");
         } catch (RuntimeException e) {
-            // Probable FK: tiene lessons asociadas
             req.setAttribute("error", "Cannot delete course with existing lessons.");
             doGet(req, resp);
         } catch (SQLException e) {
             throw new ServletException("Error deleting course(series)", e);
         }
     }
-
 }
