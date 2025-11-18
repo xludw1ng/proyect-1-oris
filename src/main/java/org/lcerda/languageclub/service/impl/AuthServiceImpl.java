@@ -1,7 +1,6 @@
 package org.lcerda.languageclub.service.impl;
 
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.lcerda.languageclub.dao.UserDao;
 import org.lcerda.languageclub.model.User;
 import org.lcerda.languageclub.service.AuthException;
@@ -10,7 +9,6 @@ import org.lcerda.languageclub.service.ValidationException;
 import org.lcerda.languageclub.util.BCryptUtil;
 
 import java.util.Locale;
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 @AllArgsConstructor
@@ -18,6 +16,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserDao userDao; //desde el Servlet
 
+    //googleado formato de email valido
     private static final Pattern EMAIL_RE =
             Pattern.compile("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
 
@@ -28,6 +27,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         String normalizedEmail = normalizeEmail(email);
+        //googleado formato de email valido
         if (!EMAIL_RE.matcher(normalizedEmail).matches()) {
             throw new ValidationException("Invalid email format");
         }
@@ -49,7 +49,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public UUID register(String email, String rawPassword, String fullName) {
+    public void register(String email, String rawPassword, String fullName) {
         if (email == null || email.isBlank()
                 || rawPassword == null || rawPassword.isBlank()
                 || fullName == null || fullName.isBlank()) {
@@ -78,7 +78,7 @@ public class AuthServiceImpl implements AuthService {
                 .isActive(true)
                 .build();
 
-        return userDao.create(user);
+        userDao.create(user);
     }
 
     // ===== helpers privados =====

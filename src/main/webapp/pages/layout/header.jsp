@@ -1,3 +1,10 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: xludw1ng
+  Date: 2025-11-15
+  Time: 19:32
+  To change this template use File | Settings | File Templates.
+--%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
@@ -25,7 +32,7 @@
                     </a>
                 </li>
 
-                <!-- Enlace de admin sólo si es admin -->
+                <!-- Enlace sólo si es admin -->
                 <c:if test="${sessionScope.isAdmin}">
                     <li class="nav-item">
                         <a class="nav-link" href="${pageContext.request.contextPath}/admin/users">

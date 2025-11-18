@@ -9,10 +9,6 @@ import java.util.UUID;
 public interface SeriesDao {
     List<Series> findAll();
 
-    Optional<Series> findById(UUID id);
-
-    Optional<Series> findByCode(String code);
-
     UUID create(Series series);
 
     List<Series> findByTeacherId(UUID teacherId);

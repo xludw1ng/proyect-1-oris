@@ -7,7 +7,7 @@
             driverClassName="org.postgresql.Driver"
             url="jdbc:postgresql://localhost:5448/proyect-oris-1"
             username="xludw1ng"
-            password="${LC_DB_PASS}"
+            password="123456"
             initialSize="2"
             minIdle="2"
             maxIdle="5"

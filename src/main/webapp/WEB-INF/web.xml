@@ -28,15 +28,6 @@
         <param-value>123456</param-value>
     </context-param>
 
-    <!-- I18N -->
-    <context-param>
-        <param-name>supportedLocales</param-name>
-        <param-value>en,ru</param-value>
-    </context-param>
-    <context-param>
-        <param-name>defaultLocale</param-name>
-        <param-value>en</param-value>
-    </context-param>
 
     <!-- Uploads -->
     <context-param>
@@ -53,18 +44,8 @@
         <listener-class>org.lcerda.languageclub.web.listener.AppContextListener</listener-class>
     </listener>
 
-<!--     ========= Filtros =========-->
-<!--     1) Charset a UTF-8-->
-<!--    <filter>-->
-<!--        <filter-name>CharsetFilter</filter-name>-->
-<!--        <filter-class>org.lcerda.languageclub.web.filter.CharsetFilter</filter-class>-->
-<!--    </filter>-->
-<!--    <filter-mapping>-->
-<!--        <filter-name>CharsetFilter</filter-name>-->
-<!--        <url-pattern>/*</url-pattern>-->
-<!--    </filter-mapping>-->
 
-    <!-- 3) Autenticación (protege /app/*) -->
+    <!-- 1) Autenticación (protege /app/*) -->
     <filter>
         <filter-name>AuthFilter</filter-name>
         <filter-class>org.lcerda.languageclub.web.filter.AuthFilter</filter-class>
@@ -74,7 +55,7 @@
         <url-pattern>/app/*</url-pattern>
     </filter-mapping>
 
-    <!-- 4) Roles (protege /admin/*) -->
+    <!-- 2) Roles (protege /admin/*) -->
     <filter>
         <filter-name>RoleFilter</filter-name>
         <filter-class>org.lcerda.languageclub.web.filter.RoleFilter</filter-class>
@@ -143,10 +124,6 @@
     <servlet-mapping>
         <servlet-name>LessonFormServlet</servlet-name>
         <url-pattern>/app/lessons/new</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>LessonFormServlet</servlet-name>
-        <url-pattern>/app/lessons/edit</url-pattern>
     </servlet-mapping>
     <servlet>
         <servlet-name>LessonEnrollServlet</servlet-name>

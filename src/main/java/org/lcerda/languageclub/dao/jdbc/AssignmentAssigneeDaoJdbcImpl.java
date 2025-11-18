@@ -16,8 +16,6 @@ public class AssignmentAssigneeDaoJdbcImpl implements AssignmentAssigneeDao {
 
     private final Connection connection;
 
-    private static final String FIND_USERS = "SELECT user_id FROM assignment_assignees WHERE assignment_id = ?";
-
     private static final String DELETE_BY_ASSIGNMENT = """
         DELETE FROM assignment_assignees
         WHERE assignment_id = ?
@@ -34,23 +32,6 @@ public class AssignmentAssigneeDaoJdbcImpl implements AssignmentAssigneeDao {
         WHERE assignment_id = ? AND user_id = ?
         """;
 
-    @Override
-    public Set<UUID> findUserIdsByAssignment(UUID assignmentId) {
-        Set<UUID> ids = new HashSet<>();
-        if (assignmentId == null) return ids;
-
-        try (PreparedStatement ps = connection.prepareStatement(FIND_USERS)) {
-            ps.setObject(1, assignmentId);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    ids.add(rs.getObject("user_id", UUID.class));
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Error loading assignees for assignment " + assignmentId, e);
-        }
-        return ids;
-    }
 
     @Override
     public void replaceAssignees(UUID assignmentId, Set<UUID> userIds) {

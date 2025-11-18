@@ -40,7 +40,7 @@ public class LessonServiceImpl implements LessonService {
 
 
     @Override
-    public UUID createLessonForUser(
+    public void createLessonForUser(
             User user,
             Set<String> roles,
             UUID seriesId,
@@ -101,7 +101,7 @@ public class LessonServiceImpl implements LessonService {
                 .notes((notes != null && !notes.isBlank()) ? notes.trim() : null)
                 .build();
 
-        return lessonDao.create(lesson);
+        lessonDao.create(lesson);
     }
 
     @Override

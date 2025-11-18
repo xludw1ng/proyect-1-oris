@@ -31,7 +31,6 @@ public class AuthServlet extends HttpServlet {
         switch (path) {
             case "/login" -> showLoginForm(req, resp);
             case "/logout" -> doLogout(req, resp);
-            case "/register" -> resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             default -> resp.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
 
@@ -50,7 +49,7 @@ public class AuthServlet extends HttpServlet {
         resp.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
         resp.setHeader("Pragma", "no-cache");                                   // HTTP 1.0
         resp.setDateHeader("Expires", 0);
-
+        ///
         req.getRequestDispatcher("/pages/auth/login.jsp")
                 .forward(req, resp);
     }
@@ -74,7 +73,7 @@ public class AuthServlet extends HttpServlet {
         if ("/login".equals(path)) {
             String email = req.getParameter("email");
             String password = req.getParameter("password");
-
+            //salva en caso de error
             req.setAttribute("email", email);
 
             try (Connection conn = DataSourceProvider.getConnection(getServletContext())) {
@@ -92,7 +91,7 @@ public class AuthServlet extends HttpServlet {
                 session.setAttribute("isAdmin", roleCodes.contains("ADMIN"));
                 session.setAttribute("isTeacher", roleCodes.contains("TEACHER"));
 
-                resp.sendRedirect(req.getContextPath() + "/app/home"); // o "/"
+                resp.sendRedirect(req.getContextPath() + "/");
             } catch (ValidationException | AuthException e) {
                 req.setAttribute("error", e.getMessage());
                 req.getRequestDispatcher("/pages/auth/login.jsp")

@@ -29,16 +29,6 @@ public class AttendanceDaoJdbcImpl implements AttendanceDao {
         ORDER BY user_id
     """;
 
-    private static final String FIND_ONE = """
-        SELECT lesson_id,
-               user_id,
-               status_id,
-               attended_at,
-               created_at,
-               comment
-        FROM attendance
-        WHERE lesson_id = ? AND user_id = ?
-    """;
 
         private static final String UPSERT = """
         INSERT INTO attendance (lesson_id, user_id, status_id, attended_at, comment)
@@ -49,13 +39,6 @@ public class AttendanceDaoJdbcImpl implements AttendanceDao {
             comment     = EXCLUDED.comment
     """;
 
-    private static final String DELETE_BY_LESSON = """
-        DELETE FROM attendance WHERE lesson_id = ?
-    """;
-
-    private static final String DELETE_ONE = """
-        DELETE FROM attendance WHERE lesson_id = ? AND user_id = ?
-    """;
 
     // helper para mapear una fila a Attendance
     private static Attendance mapAtt(ResultSet rs) throws SQLException {
@@ -97,27 +80,6 @@ public class AttendanceDaoJdbcImpl implements AttendanceDao {
         return result;
     }
 
-    @Override
-    public Optional<Attendance> findByLessonIdAndUserId(UUID lessonId, UUID userId) {
-        if (lessonId == null || userId == null) {
-            return Optional.empty();
-        }
-
-        try (PreparedStatement ps = connection.prepareStatement(FIND_ONE)) {
-            ps.setObject(1, lessonId);
-            ps.setObject(2, userId);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return Optional.of(mapAtt(rs));
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(
-                    "findByLessonIdAndUserId error: lessonId=" + lessonId + ", userId=" + userId, e);
-        }
-        return Optional.empty();
-    }
 
     @Override
     public void upsert(Attendance attendance) {
@@ -145,31 +107,7 @@ public class AttendanceDaoJdbcImpl implements AttendanceDao {
         }
     }
 
-    @Override
-    public void deleteByLessonId(UUID lessonId) {
-        if (lessonId == null) return;
 
-        try (PreparedStatement ps = connection.prepareStatement(DELETE_BY_LESSON)) {
-            ps.setObject(1, lessonId);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException("deleteByLessonId error: " + lessonId, e);
-        }
-    }
-
-    @Override
-    public void deleteByLessonIdAndUserId(UUID lessonId, UUID userId) {
-        if (lessonId == null || userId == null) return;
-
-        try (PreparedStatement ps = connection.prepareStatement(DELETE_ONE)) {
-            ps.setObject(1, lessonId);
-            ps.setObject(2, userId);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(
-                    "deleteByLessonIdAndUserId error: lessonId=" + lessonId + ", userId=" + userId, e);
-        }
-    }
 
     @Override
     public List<AttendanceStatus> findAllStatuses() {

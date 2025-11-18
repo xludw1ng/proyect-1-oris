@@ -12,7 +12,7 @@ public interface LessonService {
 
     List<Lesson> getLessonsForUser(User user, Set<String> roles);
 
-    UUID createLessonForUser(
+    void createLessonForUser(
             User user,
             Set<String> roles,
             UUID seriesId,

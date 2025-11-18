@@ -7,21 +7,16 @@
 --%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+<!-- CSS propio -->
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/app.css">
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Language Club – Welcome</title>
-
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-          rel="stylesheet"
-          crossorigin="anonymous"/>
-
-    <!-- CSS propio -->
-    <link rel="stylesheet"
-          href="${pageContext.request.contextPath}/resources/css/app.css">
 </head>
 <body class="bg-light">
 
@@ -44,25 +39,20 @@
                     </p>
 
                     <!-- Mensaje según si hay usuario en sesión o no -->
-                    <c:choose>
-                        <c:when test="${not empty sessionScope.currentUser}">
-                            <p class="mb-4">
-                                Welcome,
-                                <strong>${sessionScope.currentUser.fullName}</strong>!<br/>
-                                Use the dashboard to manage your courses and activities.
-                            </p>
 
-                            <a href="${pageContext.request.contextPath}/app/home"
-                               class="btn btn-primary me-2">
-                                Go to dashboard
-                            </a>
+                    <c:if test="${not empty sessionScope.currentUser}">
+                        <p class="mb-4">
+                            Welcome,
+                            <strong>${sessionScope.currentUser.fullName}</strong>!<br/>
+                            Use the dashboard to manage your courses and activities.
+                        </p>
 
-                            <a href="${pageContext.request.contextPath}/logout"
-                               class="btn btn-outline-secondary">
-                                Logout
-                            </a>
-                        </c:when>
-                    </c:choose>
+                        <a href="${pageContext.request.contextPath}/app/home"
+                           class="btn btn-primary me-2">
+                            Go to dashboard
+                        </a>
+                    </c:if>
+
 
                     <hr class="my-4"/>
 

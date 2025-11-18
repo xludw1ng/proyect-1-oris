@@ -15,6 +15,5 @@ public interface UserDao {
     List<User> findAll();
     void updateActive(UUID id, boolean active);
     boolean deleteById(UUID id);
-    List<User> findActiveStudents();
     List<User> findAllByRoleCode(String roleCode);
 }

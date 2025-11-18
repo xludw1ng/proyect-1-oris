@@ -26,13 +26,6 @@ public class SeriesDaoJdbcImpl implements SeriesDao {
                 ORDER BY created_at DESC
             """;
 
-    private static final String FIND_BY_ID = BASE_SELECT + """
-                WHERE id = ?
-            """;
-
-    private static final String FIND_BY_CODE = BASE_SELECT + """
-                WHERE lower(code) = ?
-            """;
 
     private static final String INSERT = """
                 INSERT INTO series (id, code, language, level, title, description)
@@ -93,41 +86,7 @@ public class SeriesDaoJdbcImpl implements SeriesDao {
         return list;
     }
 
-    @Override
-    public Optional<Series> findById(UUID id) {
-        if (id == null) return Optional.empty();
 
-        try (PreparedStatement ps = connection.prepareStatement(FIND_BY_ID)) {
-            ps.setObject(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return Optional.of(mapSeries(rs));
-                }
-                return Optional.empty();
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("findById series error: " + id, e);
-        }
-    }
-
-    @Override
-    public Optional<Series> findByCode(String code) {
-        if (code == null || code.isBlank()) return Optional.empty();
-
-        String normalized = code.trim().toLowerCase(Locale.ROOT);
-
-        try (PreparedStatement ps = connection.prepareStatement(FIND_BY_CODE)) {
-            ps.setString(1, normalized);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return Optional.of(mapSeries(rs));
-                }
-                return Optional.empty();
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("findByCode series error: " + code, e);
-        }
-    }
 
     @Override
     public UUID create(Series series) {

@@ -47,15 +47,6 @@ public class UserDaoJdbcImpl implements UserDao {
                 WHERE id = ?
             """;
 
-    private static final String FIND_ACTIVE_STUDENTS = """
-                SELECT u.id, u.email, u.password_hash, u.full_name, u.is_active, u.created_at, u.updated_at
-                FROM users as u
-                INNER JOIN user_roles as ur ON ur.user_id = u.id
-                INNER JOIN roles as r ON r.id = ur.role_id
-                WHERE u.is_active = TRUE
-                  AND r.code = 'STUDENT'
-                ORDER BY u.full_name ASC
-            """;
 
     private static final String FIND_ALL_BY_ROLE_CODE = """
                 SELECT u.id, u.email, u.password_hash, u.full_name,
@@ -232,21 +223,6 @@ public class UserDaoJdbcImpl implements UserDao {
         }
     }
 
-    @Override
-    public List<User> findActiveStudents() {
-        List<User> result = new ArrayList<>();
-
-        try (PreparedStatement ps = connection.prepareStatement(FIND_ACTIVE_STUDENTS);
-             ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                result.add(getU(rs));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("findActiveStudents error", e);
-        }
-        return result;
-    }
 
     @Override
     public List<User> findAllByRoleCode(String roleCode) {

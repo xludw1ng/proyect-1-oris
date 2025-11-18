@@ -19,6 +19,6 @@ public interface SubmissionService {
     // usamos tu modelo SubmissionsStatus
     List<SubmissionsStatus> getAllStatuses();
 
-    // 🔹 nuevo: poner/quitar nota
+    //nuevo: poner/quitar nota
     void gradeSubmission(UUID assignmentId, UUID studentId, User currentUser, Set<String> roles, Integer grade);
 }
