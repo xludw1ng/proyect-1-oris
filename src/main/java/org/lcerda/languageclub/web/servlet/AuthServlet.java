@@ -55,7 +55,7 @@ public class AuthServlet extends HttpServlet {
     }
 
     private void doLogout(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+            throws IOException {
         HttpSession session = req.getSession(false);
         if (session != null) {
             session.invalidate();

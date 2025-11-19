@@ -60,21 +60,7 @@ public class UserDaoJdbcImpl implements UserDao {
             """;
 
 
-    //+++++++helpers++++
-
-    private static Optional<String> normalizeEmail(String email) {
-        if (email == null) return Optional.empty();
-        String e = email.trim().toLowerCase(Locale.ROOT);
-        if (e.isEmpty()) return Optional.empty();
-        // Validación mínima: un solo @ y dominio con punto
-        int at = e.indexOf('@');
-        if (at <= 0 || at != e.lastIndexOf('@')) return Optional.empty();
-        String domain = e.substring(at + 1);
-        if (domain.isBlank() || !domain.contains(".") || domain.startsWith(".") || domain.endsWith(".")) {
-            return Optional.empty();
-        }
-        return Optional.of(e);
-    }
+    //helper
 
 
     private static User getU(ResultSet rs) throws SQLException {
@@ -101,11 +87,13 @@ public class UserDaoJdbcImpl implements UserDao {
 
     @Override
     public Optional<User> findByEmail(String email) {
-        Optional<String> normalizedEmail = normalizeEmail(email);
-        if (normalizedEmail.isEmpty()) return Optional.empty();
+
+        if (email == null || email.isBlank()) {
+            return Optional.empty();
+        }
 
         try (PreparedStatement ps = connection.prepareStatement(FIND_BY_EMAIL)) {
-            ps.setString(1, normalizedEmail.get());
+            ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return Optional.of(getU(rs));
@@ -141,8 +129,7 @@ public class UserDaoJdbcImpl implements UserDao {
         if (user == null) throw new IllegalArgumentException("User cannot be null.");
 
         // chequeos de email hash y nombre
-        String email = normalizeEmail(user.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("Email is invalid or empty."));
+        String email = user.getEmail();
         String hash = user.getPasswordHash();
         String fullName = user.getFullName() != null ? user.getFullName().trim() : "";
 
